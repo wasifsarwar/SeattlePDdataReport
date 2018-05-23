@@ -5,6 +5,7 @@
 ## Rey Matsunaga
 ## Israel Sixto-Sanchez
 
+<<<<<<< HEAD
 library("dplyr")
 library("ggplot2")
 library("tidyverse")
@@ -26,6 +27,20 @@ View(data)
 data_columns <- c("Bill ID", "Name", "Legislator", "Active", "URL")
 colnames(short_df) <- data_columns
 short_df
+=======
+library(httr)
+library(jsonlite)
+
+#####################
+######## API ########
+#####################
+
+resource <- paste0("https://data.seattle.gov/resource/y7pv-r3kh.json")
+response <- GET(resource, add_headers("X-API-Key" = token))
+fromJSON <- fromJSON(content(response, "text"))
+data <- flatten(data.frame(fromJSON$results$bills))
+
+>>>>>>> wasif
 
 #####################
 #### SECTION ONE ####
