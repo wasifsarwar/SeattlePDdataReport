@@ -18,11 +18,7 @@ source("api_token.R")
 ######## API ########
 #####################
 
-resource <- paste0("https://data.seattle.gov/resource/y7pv-r3kh.json")
-response <- GET(resource, add_headers(token))
-fromJSON <- fromJSON(content(response, "text"))
-data <- flatten(data.frame(fromJSON))
-  
+
 #####################
 ######## API ########
 #####################
