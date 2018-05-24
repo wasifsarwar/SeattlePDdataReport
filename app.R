@@ -19,6 +19,9 @@ source("api_token.R")
 #####################
 
 
+data <- read.table("./data/Seattle_Police_Department_Police_Report_Incident.csv.zip")
+
+
 #####################
 ######## API ########
 #####################
