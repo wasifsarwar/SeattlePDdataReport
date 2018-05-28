@@ -9,15 +9,9 @@ library(dplyr)
 library(ggplot2)
 library(tidyverse)
 library(shiny)
-library(httr)
-library(jsonlite)
 library(leaflet)
 library(leaflet.extras)
-
-#####################
-######## API ########
-#####################
-
+library(shinythemes)
 
 data <- read.csv("./data/Seattle_police_data_2017.csv",na.strings = "NA",
                    stringsAsFactors = FALSE, fill = TRUE, header = TRUE)
@@ -30,6 +24,8 @@ month <- c("January", "February", "March", "April", "May", "June", "July",
 
  
 ui <- fluidPage(
+  shinythemes::themeSelector(),
+  #theme = shinythemes::shinytheme("journal"),
   titlePanel("Seattle PD data report 2017"),
   
   tabsetPanel(
@@ -124,18 +120,16 @@ server <- function(input,output) {
   
   output$heatmap <- renderLeaflet({
     data_plot <- filtered_table_heatmap()
-    lat <- as.vector(select(data_plot,Latitude))
-    long <- as.vector(select(data_plot,Longitude))
     
     map <- leaflet(data_plot) %>%
-      addTiles() %>%  # Add default OpenStreetMap map tiles
-      #addProviderTiles(providers$Stamen.TonerLite,
-       #                options = providerTileOptions(noWrap = TRUE)
-      #) %>% 
-      #addWebGLHeatmap(lng=~long, lat=~lat,size=1000)
-      addCircles(lng=~Longitude, lat=~Latitude)
+      #addTiles() %>%  # Add default OpenStreetMap map tiles
+      addProviderTiles("CartoDB.Positron") %>%
+      addHeatmap(lng= ~Longitude, lat= ~Latitude,
+                 blur = 18, max = 0.5 , radius = 15)
     return(map)
   })
+  
+  #output$maptitle <- render
   
   #####################
   #### SECTION ONE ####
