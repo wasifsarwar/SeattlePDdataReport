@@ -79,7 +79,7 @@ server <- function(input,output) {
   
   
   # reactive variable for shared data
-  filtered_table <- reactive({
+  filtered_table_heatmap <- reactive({
     crime_data <- data %>%
       filter(Offense.type == input$crime_type[1]) 
     
@@ -89,7 +89,8 @@ server <- function(input,output) {
   })
   
   output$heatmap <- renderLeaflet({
-    data_plot <- 
+    data_plot <- filtered_table() 
+    
     leaflet() %>%
       addProviderTiles(providers$Stamen.TonerLite,
                        options = providerTileOptions(noWrap = TRUE)
