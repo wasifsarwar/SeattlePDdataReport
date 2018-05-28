@@ -15,7 +15,7 @@ library(shinythemes)
 
 data <- read.csv("./data/Seattle_police_data_2017.csv",na.strings = "NA",
                    stringsAsFactors = FALSE, fill = TRUE, header = TRUE)
-offense_type <- unique(data$Summarized.Offense.Description)
+offense_type <- tolower(unique(data$Summarized.Offense.Description))
 month <- c("January", "February", "March", "April", "May", "June", "July",
            "August","September", "October", "November", "December")
 
@@ -26,6 +26,16 @@ month <- c("January", "February", "March", "April", "May", "June", "July",
 ui <- fluidPage(
   shinythemes::themeSelector(),
   #theme = shinythemes::shinytheme("journal"),
+  
+  tags$head(tags$style(HTML("
+                                #maptitle {
+                            text-align: center;
+                            }
+                            div.box-header {
+                            text-align: center;
+                            }
+                            "))),
+  
   titlePanel("Seattle PD data report 2017"),
   
   tabsetPanel(
@@ -37,8 +47,10 @@ ui <- fluidPage(
           selectInput("months", "Month", choices = month, selected = "")
       ),
         mainPanel(
+          textOutput("maptitle"),
+          br(),
           leafletOutput("heatmap"),
-          p()
+          br()
         )
       )
     ),
@@ -110,7 +122,7 @@ server <- function(input,output) {
   filtered_table_heatmap <- reactive({
     month <- select_month()
     crime_data <- filter(data,Summarized.Offense.Description == 
-                           input$crime_type[1]) %>% 
+                           toupper(input$crime_type[1])) %>% 
                   filter(Month == month)
     
     result <- select(crime_data,Date.Reported,Longitude,Latitude,Location,
@@ -122,14 +134,18 @@ server <- function(input,output) {
     data_plot <- filtered_table_heatmap()
     
     map <- leaflet(data_plot) %>%
-      #addTiles() %>%  # Add default OpenStreetMap map tiles
       addProviderTiles("CartoDB.Positron") %>%
       addHeatmap(lng= ~Longitude, lat= ~Latitude,
                  blur = 18, max = 0.5 , radius = 15)
     return(map)
   })
   
-  #output$maptitle <- render
+  output$maptitle <- renderText({
+    text <- HTML(paste0("Heat map for ", tolower(input$crime_type[1]), " in the month of ",
+                   input$months[1]))
+    return(text)
+                   
+  })
   
   #####################
   #### SECTION ONE ####
