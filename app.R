@@ -12,14 +12,12 @@ library(shiny)
 library(httr)
 library(jsonlite)
 
-source("api_token.R")
-
 #####################
 ######## API ########
 #####################
 
 
-data <- read.table("./data/Seattle_Police_Department_Police_Report_Incident.csv",na.strings = "NA",
+data <- read.csv("./data/Seattle_Police_Department_Police_Report_Incident.csv",na.strings = "NA",
                    stringsAsFactors = FALSE,fill = TRUE, header = TRUE)
  
 
