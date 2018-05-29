@@ -54,16 +54,18 @@ ui <- fluidPage(
                )
              )
     ),
-    tabPanel("Jeremy", fluid = TRUE,
-             sidebarLayout(   # layout the page in two columns
-               sidebarPanel(  # specify content for the "sidebar" column
-                 p("sidebar panel content goes here")
-               ),
-               mainPanel(     # specify content for the "main" column
-                 p("main panel content goes here")
-               )
-             )
-    ),
+    tabPanel("Top 5 Crimes", fluid = TRUE,
+      sidebarLayout(   # layout the page in two columns
+        sidebarPanel(  # specify content for the "sidebar" column
+          # District Selector
+          selectInput("user_district", "District Sector", choices = District.Sector, selected = "")
+        ),
+        mainPanel(     # specify content for the "main" column
+          textOutput("Bar Graph"),
+          br(),
+          plotOutput("bargraph")
+        )
+      ),
     tabPanel("Crime Frequency" , fluid = TRUE,
              sidebarLayout(   # layout the page in two columns
                sidebarPanel(  # specify content for the "sidebar" column
@@ -87,7 +89,7 @@ ui <- fluidPage(
              )
     )
   )
-  )
+  ),
 
 server <- function(input,output) {
   
@@ -158,6 +160,39 @@ server <- function(input,output) {
   #####################
   #### SECTION TWO ####
   #####################
+  #Jeremy: create a bar graph that shows the top 5 most frequent crimes in 2017. Can filter for district
+  # Reactive Data Table for the top 5 crimes
+  filtered_table_bargraph <- reactive({
+    # Filter for the user selected district via a selection drop down
+    district_data <- filter(data, District.Sector == 
+                            toupper(input$user_district[1])) 
+    
+    # Selects the Summarized.Offense.Description Column and orders it by frequency
+    grouped_result <- group_by(district_data, Summarized.Offense.Description) %>% 
+      summarize(
+        n = n()
+      ) %>% 
+      arrange(-n)
+    
+    # Selects the top 5 crimes within the user selected district
+    top_5 <- grouped_result[1:5, ]
+      
+    return(top_5)
+  })
+  
+  # Create a bar graph with the top 5 crimes on the x-axis and the frequency on the y-axis
+  output$bargraph <- renderPlot({
+    data_bar_graph <- filtered_table_bargraph()
+    
+    bar <- ggplot(data = data_bar_graph) +
+      
+      ggtitle("Top 5 Crimes in the Selected District in 2017") +
+      xlab("Ethnicity") +
+      ylab("Percentage (%)") +
+    
+      
+    return(bar)
+  })
   
   
   #######################
