@@ -38,7 +38,9 @@ ui <- fluidPage(
                             }
                             "))),
   
-  titlePanel("Seattle PD data report 2017"),
+  titlePanel(
+    "Seattle PD data report 2017"
+    ),
   
   tabsetPanel(
     tabPanel("HeatMap", fluid = TRUE,
@@ -49,6 +51,7 @@ ui <- fluidPage(
                  selectInput("months", "Month", choices = month, selected = "")
                ),
                mainPanel(
+                 br(),
                  textOutput("maptitle"),
                  br(),
                  leafletOutput("heatmap"),
@@ -97,6 +100,7 @@ ui <- fluidPage(
 
 server <- function(input,output) {
   
+  # converts month name to indexes 
   select_month <- reactive({
     text <- input$months[1]
     if (text == "January" ){
@@ -135,10 +139,11 @@ server <- function(input,output) {
       filter(Month == month)
     
     result <- select(crime_data,Date.Reported,Longitude,Latitude,Location,
-                     Month,Year)
+                     Month,Year,Occurred.Date.Range.End)
     return(result)
   })
   
+  # outputs a heatmap for the selected crime
   output$heatmap <- renderLeaflet({
     data_plot <- filtered_table_heatmap()
     
@@ -146,9 +151,11 @@ server <- function(input,output) {
       addProviderTiles("CartoDB.Positron") %>%
       addHeatmap(lng= ~Longitude, lat= ~Latitude,
                  blur = 18, max = 0.5 , radius = 15)
+    
     return(map)
   })
   
+  # outputs a title for the map
   output$maptitle <- renderText({
     text <- HTML(paste0("Heat map for ", tolower(input$crime_type[1]), " in the month of ",
                         input$months[1]))
@@ -156,16 +163,27 @@ server <- function(input,output) {
     
   })
   
+  # outputs an analysis for the heatmap visualiztion
   output$map_analysis <- renderText({
     data_text <- filtered_table_heatmap()
+    unsolved <- data_text %>% 
+                filter(Occurred.Date.Range.End == "") 
+    unsolved <- NROW(unsolved$Location)    
     count <- NROW(data_text$Location)
-    text <- HTML(
+    solved <- count - unsolved
+    summary <-
       paste0(
         "The heatmap here represents the areas in Seattle where the crime type '", input$crime_type[1], "' is the most common in the 
-        month of ", input$months[1], ". The areas on the map that is more saturated is where '", input$crime_type[1], "' is more frequent.
-        There was ", count, " reports of '", input$crime_type[1], "' in ", input$months[1], "."
-      )
-    )
+        month of ", input$months[1], ". The areas on the map that is more saturated is where '", input$crime_type[1], "' is more frequent.")
+    report <- 
+      if (count > 0){
+      paste0(" There were ", count, " reports of '", input$crime_type[1], "' in ", input$months[1], ", of which ", solved, " reports have been
+        resolved by the Police, and for the rest of ", unsolved, " reports, the investigation is still ongoing.")
+      } else if( count == 0) {
+        paste0(" There was no report of ' ", input$crime_type[1], "' in ", input$months[1], ".")
+      }
+    text <- HTML(paste0(summary,report))
+    return(text)
   })
   
   
