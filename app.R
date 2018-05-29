@@ -12,6 +12,8 @@ library(shiny)
 library(leaflet)
 library(leaflet.extras)
 library(shinythemes)
+library(pracma)
+library(compare)
 
 data <- read.csv("./data/Seattle_police_data_2017.csv",na.strings = "NA",
                  stringsAsFactors = FALSE, fill = TRUE, header = TRUE)
@@ -61,7 +63,7 @@ ui <- fluidPage(
       sidebarLayout(   # layout the page in two columns
         sidebarPanel(  # specify content for the "sidebar" column
           # District Selector
-          selectInput("user_month", "Month", choices = month, selected = "")
+          selectInput("user_month", "months", choices = month, selected = "")
         ),
         mainPanel(     # specify content for the "main" column
           textOutput("Bar Graph"),
@@ -126,6 +128,7 @@ server <- function(input,output) {
     }
   })
   
+  
   # reactive variable for shared data
   filtered_table_heatmap <- reactive({
     month <- select_month()
@@ -167,11 +170,6 @@ server <- function(input,output) {
     )
   })
   
-  #####################
-  #### SECTION ONE ####
-  #####################
-  #Wasif: map visualization for a heat map, categorized by type of crime. Analysis: talk about the heat map
-  
   
   #####################
   #### SECTION TWO ####
@@ -181,8 +179,8 @@ server <- function(input,output) {
   filtered_table_bargraph <- reactive({
     # Select desired columns
     data <- select(data, Summarized.Offense.Description, Month)
-    
-    district_data <- filter(data, Month == input$user_month[1]) %>% 
+    month <- crime_month()
+    district_data <- filter(data, Month == month) %>% 
       group_by(Summarized.Offense.Description) %>% 
       summarize(
         n = n()
@@ -245,7 +243,34 @@ server <- function(input,output) {
     return(x)
   })
   
-  
+  crime_month <- reactive({
+    text <- input$user_month[1]
+    if (text == "January" ){
+      return(1)
+    } else if (text == "February"){
+      return(2)
+    } else if (text == "March") {
+      return(3)
+    } else if (text == "April") {
+      return(4)
+    } else if (text == "May") {
+      return(5)
+    } else if (text == "June") {
+      return(6)
+    } else if (text == "July") {
+      return(7)
+    } else if (text == "August") {
+      return(8)
+    } else if (text == "September") {
+      return(9)
+    } else if (text == "October") {
+      return(10)
+    } else if (text == "November") {
+      return(11)
+    } else if (text == "December") {
+      return(12)
+    }
+  })
   
   
   
