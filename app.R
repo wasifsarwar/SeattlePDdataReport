@@ -24,8 +24,8 @@ month <- c("January", "February", "March", "April", "May", "June", "July",
 
 
 ui <- fluidPage(
-  shinythemes::themeSelector(),
-  #theme = shinythemes::shinytheme("journal"),
+  #shinythemes::themeSelector(),
+  theme = shinythemes::shinytheme("spacelab"),
   
   tags$head(tags$style(HTML("
                             #maptitle {
@@ -189,8 +189,7 @@ server <- function(input,output) {
       ggtitle("Top 5 Crimes in the Selected District in 2017") +
       xlab("Ethnicity") +
       ylab("Percentage (%)")
-    
-      
+      theme_bw()
     return(bar)
   })
 
