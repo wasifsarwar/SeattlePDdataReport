@@ -24,8 +24,8 @@ month <- c("January", "February", "March", "April", "May", "June", "July",
 
 
 ui <- fluidPage(
-  shinythemes::themeSelector(),
-  #theme = shinythemes::shinytheme("journal"),
+  #shinythemes::themeSelector(),
+  theme = shinythemes::shinytheme("spacelab"),
   
   tags$head(tags$style(HTML("
                             #maptitle {
