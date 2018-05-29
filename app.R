@@ -64,12 +64,14 @@ ui <- fluidPage(
       sidebarLayout(   # layout the page in two columns
         sidebarPanel(  # specify content for the "sidebar" column
           # District Selector
-          selectInput("user_month", "months", choices = month, selected = "")
+          selectInput("user_month", "Month", choices = month, selected = "")
         ),
         mainPanel(     # specify content for the "main" column
           textOutput("Bar Graph"),
           br(),
-          plotOutput("bargraph")
+          plotOutput("bargraph"),
+          br(),
+          textOutput("bar_analysis")
         )
       )
     ),
@@ -212,15 +214,30 @@ server <- function(input,output) {
     data_bar_graph <- filtered_table_bargraph()
     
     bar <- ggplot(data = data_bar_graph,
-                  mapping = aes(x = Summarized.Offense.Description, y = n)) +
+                  mapping = aes(x = Summarized.Offense.Description, y = n,
+                                fill = Summarized.Offense.Description)) +
       geom_bar(stat = "identity") +
       ggtitle("Top 5 Crimes in the Selected Month in 2017") +
       xlab("Crime Type") +
-      ylab("Incidents")
+      ylab("Number of Incidents") +
+      guides(fill = guide_legend(title = "Crime Type")) +
       theme_bw()
     return(bar)
   })
 
+  output$bar_analysis <- renderText({
+    data_text <- filtered_table_bargraph()
+    crime_type <- data_text[, 1]
+    crime_freq <- data_text[, 2]
+    text <- HTML(paste0("The top 5 crimes that occured in ", input$user_month[1], " 2017 were ", 
+                        tolower(crime_type[1,]), " at ", crime_freq[1,], " occurances, ",
+                        tolower(crime_type[2,]), " at ", crime_freq[2,], " occurances, ",
+                        tolower(crime_type[3,]), " at ", crime_freq[3,], " occurances, ",
+                        tolower(crime_type[4,]), " at ", crime_freq[4,], " occurances, ",
+                        tolower(crime_type[5,]), " at ", crime_freq[5,], " occurances, "))
+    return(text)
+  })
+  
   #######################
   #### SECTION THREE ####
   #######################
