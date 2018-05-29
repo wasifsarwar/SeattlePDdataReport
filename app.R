@@ -54,13 +54,16 @@ ui <- fluidPage(
         )
       )
     ),
-    tabPanel("Jeremy", fluid = TRUE,
+    tabPanel("Top 5 Crimes", fluid = TRUE,
       sidebarLayout(   # layout the page in two columns
         sidebarPanel(  # specify content for the "sidebar" column
-          p("sidebar panel content goes here")
+          # District Selector
+          selectInput("district", "District Sector", choices = District.Sector, selected = "")
         ),
         mainPanel(     # specify content for the "main" column
-          p("main panel content goes here")
+          textOutput("Bar Graph"),
+          br(),
+          plotOutput("bargraph")
         )
       )
     ),
@@ -156,6 +159,25 @@ server <- function(input,output) {
   #####################
   #### SECTION TWO ####
   #####################
+  #Jeremy: create a bar graph that shows the top 5 most frequent crimes in 2017. Can filter for district
+  
+  # Reactive Data Table for the top 5 crimes
+  filtered_table_bargraph <- reactive({
+    crime <- district ## IS THIS HOW YOU UTILIZE THE USER SELECTED DISTRICT?
+    crime_data <- filter(data,Summarized.Offense.Description == 
+                           toupper(input$crime_type[1])) %>% 
+      filter(Month == month)
+    
+    result <- select(crime_data,Date.Reported,Longitude,Latitude,Location,
+                     Month,Year)
+    return(result)
+  })
+  
+  
+  # Create a bar graph with the top 5 crimes on the x-axis and the frequency on the y-axis
+  output$bargraph <- renderPlot({
+    
+  })
   
   
   #######################
