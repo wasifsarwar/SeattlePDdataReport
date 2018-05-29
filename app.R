@@ -190,8 +190,9 @@ server <- function(input,output) {
   output$bargraph <- renderPlot({
     data_bar_graph <- filtered_table_bargraph()
     
-    bar <- ggplot(data = data_bar_graph) +
-      geom_bar(mapping = aes(x = Summarized.Offense.Description, y = n))
+    bar <- ggplot(data = data_bar_graph,
+                  mapping = aes(x = Summarized.Offense.Description, y = n)) +
+      geom_bar(stat = "identity") +
       ggtitle("Top 5 Crimes in the Selected District in 2017") +
       xlab("Ethnicity") +
       ylab("Percentage (%)")
