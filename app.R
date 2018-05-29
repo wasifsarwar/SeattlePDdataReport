@@ -174,6 +174,9 @@ server <- function(input,output) {
   #Jeremy: create a bar graph that shows the top 5 most frequent crimes in 2017. Can filter for district
   # Reactive Data Table for the top 5 crimes
   filtered_table_bargraph <- reactive({
+    # Select desired columns
+    data <- select(data, Summarized.Offense.Description, District.Sector)
+    
     # Filter for the user selected district via a selection drop down
     district_data <- filter(data, District.Sector == 
                             toupper(input$user_district[1])) 
@@ -195,17 +198,16 @@ server <- function(input,output) {
   output$bargraph <- renderPlot({
     data_bar_graph <- filtered_table_bargraph()
     
-    bar <- ggplot(data = data_bar_graph) +
-      
+    bar <- ggplot(data = data_bar_graph,
+                  mapping = aes(x = Summarized.Offense.Description, y = n)) +
+      geom_bar(stat = "identity") +
       ggtitle("Top 5 Crimes in the Selected District in 2017") +
       xlab("Ethnicity") +
-      ylab("Percentage (%)") +
-    
-      
+      ylab("Percentage (%)")
+      theme_bw()
     return(bar)
   })
-  
-  
+
   #######################
   #### SECTION THREE ####
   #######################
