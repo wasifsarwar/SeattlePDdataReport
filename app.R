@@ -19,6 +19,8 @@ offense_type <- tolower(unique(data$Summarized.Offense.Description))
 month <- c("January", "February", "March", "April", "May", "June", "July",
            "August","September", "October", "November", "December")
 
+districts <- unique(data$District.Sector)
+
 
 ## we're only doing records for 2017
 
@@ -58,7 +60,7 @@ ui <- fluidPage(
       sidebarLayout(   # layout the page in two columns
         sidebarPanel(  # specify content for the "sidebar" column
           # District Selector
-          selectInput("user_district", "District Sector", choices = District.Sector, selected = "")
+          selectInput("user_district", "District Sector", choices = districts, selected = "")
         ),
         mainPanel(     # specify content for the "main" column
           textOutput("Bar Graph"),
