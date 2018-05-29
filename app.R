@@ -60,7 +60,7 @@ ui <- fluidPage(
       sidebarLayout(   # layout the page in two columns
         sidebarPanel(  # specify content for the "sidebar" column
           # District Selector
-          selectInput("user_district", "District Sector", choices = districts, selected = "")
+          selectInput("user_month", "Month", choices = month, selected = "")
         ),
         mainPanel(     # specify content for the "main" column
           textOutput("Bar Graph"),
@@ -163,26 +163,20 @@ server <- function(input,output) {
   #####################
   #### SECTION TWO ####
   #####################
-  #Jeremy: create a bar graph that shows the top 5 most frequent crimes in 2017. Can filter for district
+  #Jeremy: create a bar graph that shows the top 5 most frequent crimes every month in 2017.
   # Reactive Data Table for the top 5 crimes
   filtered_table_bargraph <- reactive({
     # Select desired columns
-    data <- select(data, Summarized.Offense.Description, District.Sector)
+    data <- select(data, Summarized.Offense.Description, Month)
     
-    # Filter for the user selected district via a selection drop down
-    district_data <- filter(data, District.Sector == 
-                            toupper(input$user_district[1])) 
-    
-    # Selects the Summarized.Offense.Description Column and orders it by frequency
-    grouped_result <- group_by(district_data, Summarized.Offense.Description) %>% 
+    district_data <- filter(data, Month == input$user_month[1]) %>% 
+      group_by(Summarized.Offense.Description) %>% 
       summarize(
         n = n()
       ) %>% 
       arrange(-n)
+    top_5 <- district_data[1:5, ]
     
-    # Selects the top 5 crimes within the user selected district
-    top_5 <- grouped_result[1:5, ]
-      
     return(top_5)
   })
   
@@ -193,9 +187,9 @@ server <- function(input,output) {
     bar <- ggplot(data = data_bar_graph,
                   mapping = aes(x = Summarized.Offense.Description, y = n)) +
       geom_bar(stat = "identity") +
-      ggtitle("Top 5 Crimes in the Selected District in 2017") +
-      xlab("Ethnicity") +
-      ylab("Percentage (%)")
+      ggtitle("Top 5 Crimes in the Selected Month in 2017") +
+      xlab("Crime Type") +
+      ylab("Incidents")
       theme_bw()
     return(bar)
   })
