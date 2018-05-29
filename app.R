@@ -185,16 +185,15 @@ server <- function(input,output) {
     data_bar_graph <- filtered_table_bargraph()
     
     bar <- ggplot(data = data_bar_graph) +
-      
+      geom_bar(mapping = aes(x = Summarized.Offense.Description, y = n))
       ggtitle("Top 5 Crimes in the Selected District in 2017") +
       xlab("Ethnicity") +
-      ylab("Percentage (%)") +
+      ylab("Percentage (%)")
     
       
     return(bar)
   })
-  
-  
+
   #######################
   #### SECTION THREE ####
   #######################
