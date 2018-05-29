@@ -65,7 +65,8 @@ ui <- fluidPage(
           br(),
           plotOutput("bargraph")
         )
-      ),
+      )
+    ),
     tabPanel("Crime Frequency" , fluid = TRUE,
              sidebarLayout(   # layout the page in two columns
                sidebarPanel(  # specify content for the "sidebar" column
@@ -89,7 +90,7 @@ ui <- fluidPage(
              )
     )
   )
-  ),
+)
 
 server <- function(input,output) {
   
