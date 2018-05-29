@@ -14,7 +14,7 @@ library(leaflet.extras)
 library(shinythemes)
 
 data <- read.csv("./data/Seattle_police_data_2017.csv",na.strings = "NA",
-                   stringsAsFactors = FALSE, fill = TRUE, header = TRUE)
+                 stringsAsFactors = FALSE, fill = TRUE, header = TRUE)
 offense_type <- tolower(unique(data$Summarized.Offense.Description))
 month <- c("January", "February", "March", "April", "May", "June", "July",
            "August","September", "October", "November", "December")
@@ -22,13 +22,13 @@ month <- c("January", "February", "March", "April", "May", "June", "July",
 
 ## we're only doing records for 2017
 
- 
+
 ui <- fluidPage(
   shinythemes::themeSelector(),
   #theme = shinythemes::shinytheme("journal"),
   
   tags$head(tags$style(HTML("
-                                #maptitle {
+                            #maptitle {
                             text-align: center;
                             }
                             div.box-header {
@@ -40,19 +40,19 @@ ui <- fluidPage(
   
   tabsetPanel(
     tabPanel("HeatMap", fluid = TRUE,
-      sidebarLayout(
-        sidebarPanel(
-        # State Widget
-          selectInput("crime_type", "Offense Type", choices = offense_type, selected = ""),
-          selectInput("months", "Month", choices = month, selected = "")
-      ),
-        mainPanel(
-          textOutput("maptitle"),
-          br(),
-          leafletOutput("heatmap"),
-          br()
-        )
-      )
+             sidebarLayout(
+               sidebarPanel(
+                 # State Widget
+                 selectInput("crime_type", "Offense Type", choices = offense_type, selected = ""),
+                 selectInput("months", "Month", choices = month, selected = "")
+               ),
+               mainPanel(
+                 textOutput("maptitle"),
+                 br(),
+                 leafletOutput("heatmap"),
+                 br()
+               )
+             )
     ),
     tabPanel("Top 5 Crimes", fluid = TRUE,
       sidebarLayout(   # layout the page in two columns
@@ -65,30 +65,30 @@ ui <- fluidPage(
           br(),
           plotOutput("bargraph")
         )
-      )
-    ),
-    tabPanel("Rey" , fluid = TRUE,
-      sidebarLayout(   # layout the page in two columns
-        sidebarPanel(  # specify content for the "sidebar" column
-          p("sidebar panel content goes here")
-        ),
-        mainPanel(     # specify content for the "main" column
-          p("main panel content goes here")
-        )
-      )
+      ),
+    tabPanel("Crime Frequency" , fluid = TRUE,
+             sidebarLayout(   # layout the page in two columns
+               sidebarPanel(  # specify content for the "sidebar" column
+                 selectInput("crime_freq_type", "Offense Type", choices = offense_type, selected = "")
+               ),
+               mainPanel(
+                 br(),
+                 plotOutput("freq_plot"),
+                 br()
+               )
+             )
     ),
     tabPanel("Israel", fluid = TRUE,
-      sidebarLayout(   # layout the page in two columns
-        sidebarPanel(  # specify content for the "sidebar" column
-          p("sidebar panel content goes here")
-        ),
-        mainPanel(     # specify content for the "main" column
-          p("main panel content goes here")
-        )
-      )
+             sidebarLayout(   # layout the page in two columns
+               sidebarPanel(  # specify content for the "sidebar" column
+                 p("sidebar panel content goes here")
+               ),
+               mainPanel(     # specify content for the "main" column
+                 p("main panel content goes here")
+               )
+             )
     )
   )
-)
 
 server <- function(input,output) {
   
@@ -126,7 +126,7 @@ server <- function(input,output) {
     month <- select_month()
     crime_data <- filter(data,Summarized.Offense.Description == 
                            toupper(input$crime_type[1])) %>% 
-                  filter(Month == month)
+      filter(Month == month)
     
     result <- select(crime_data,Date.Reported,Longitude,Latitude,Location,
                      Month,Year)
@@ -145,9 +145,9 @@ server <- function(input,output) {
   
   output$maptitle <- renderText({
     text <- HTML(paste0("Heat map for ", tolower(input$crime_type[1]), " in the month of ",
-                   input$months[1]))
+                        input$months[1]))
     return(text)
-                   
+    
   })
   
   #####################
@@ -190,12 +190,41 @@ server <- function(input,output) {
   #### SECTION FOUR ####
   ######################
   
-}
+  # GEt data
+  filtered_table_freq_plot <- reactive({
+    data <- filter(data,Summarized.Offense.Description == 
+                           toupper(input$crime_freq_type))
+    
+    result <- select(data, Summarized.Offense.Description, Month)
+    
+    return(result)
+  })
   
+  
+  # Render frequncy Plot over time for specified crime
+  
+  output$freq_plot <- renderPlot({
+    result <- filtered_table_freq_plot()
+    
+    x <- ggplot(data = result) +
+      geom_bar(mapping = aes(x = Month), stat = "count", width = .5) + # no y mapping needed!
+      labs(
+        title=paste0(input$crime_freq_type, " in 2017"),
+        x = "Month",
+        y = paste0("Count for ", input$crime_freq_type),
+        legend = ""
+      ) + 
+      guides(fill = guide_legend(title=""))
+    return(x)
+  })
+  
+  
+  
+  
+  
+  
+  
+}
+
 # Create a new `shinyApp()` using the above ui and server
 shinyApp(ui = ui, server = server)
-
-
-
-
-
