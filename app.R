@@ -12,8 +12,6 @@ library(shiny)
 library(leaflet)
 library(leaflet.extras)
 library(shinythemes)
-library(pracma)
-library(compare)
 
 data <- read.csv("./data/Seattle_police_data_2017.csv",na.strings = "NA",
                  stringsAsFactors = FALSE, fill = TRUE, header = TRUE)
