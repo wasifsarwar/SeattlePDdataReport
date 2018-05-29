@@ -154,6 +154,14 @@ server <- function(input,output) {
     
   })
   
+  output$map_analysis <- renderText({
+    text <- HTML(
+      paste0(
+        ""
+      )
+    )
+  })
+  
   #####################
   #### SECTION ONE ####
   #####################
