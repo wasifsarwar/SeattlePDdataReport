@@ -52,7 +52,8 @@ ui <- fluidPage(
                  textOutput("maptitle"),
                  br(),
                  leafletOutput("heatmap"),
-                 br()
+                 br(),
+                 textOutput("map_analysis")
                )
              )
     ),
@@ -155,9 +156,13 @@ server <- function(input,output) {
   })
   
   output$map_analysis <- renderText({
+    data_text <- filtered_table_heatmap()
+    count <- NROW(data_text$Location)
     text <- HTML(
       paste0(
-        ""
+        "The heatmap here represents the areas in Seattle where the crime type '", input$crime_type[1], "' is the most common in the 
+        month of ", input$months[1], ". The areas on the map that is more saturated is where '", input$crime_type[1], "' is more frequent.
+        There was ", count, " reports of '", input$crime_type[1], "' in ", input$months[1], "."
       )
     )
   })
