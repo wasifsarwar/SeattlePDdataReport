@@ -1,1 +1,20 @@
-# SeattlePDdataReport
+# Seattle Crime Data Report of 2017
+
+### Wasif Siddique, Jeremy Chang, Rey Matsunaga and Israel Sixto-Sanchez
+
+The data report contains textual and visual representations explaining the trends of the _crime rates_ in **Seattle**. The report is created using **R** and the **shiny** framework. 
+
+The report answers 4 questions about crime in Seattle:
+
+* For a particular category of crime and a specific month in 2017 , which regions in Seattle has the highest record of reports the Police had received? How many reports have been resolved and how many investigations are still ongoing?
+
+* What are the top 5 crimes that has been reported the most for a specific month in Seattle?
+
+* Rey's question
+
+* Israel's question
+
+For visual representations of the data, **leaflet** and **ggplot** is used.
+
+The raw data used to create this data report is sourced from here: 
+[Seattle PD data]https://data.seattle.gov/Public-Safety/Seattle-Police-Department-Police-Report-Incident/7ais-f98f 
