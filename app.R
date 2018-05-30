@@ -36,14 +36,17 @@ ui <- fluidPage(
                             div.box-header {
                             text-align: center;
                             }
+                            #bar_title {
+                            text-align: center;
+                            }
                             "))),
   
   titlePanel(
-    "Seattle PD data report 2017"
+    "Seattle crime data report 2017"
     ),
   
   tabsetPanel(
-    tabPanel("HeatMap", fluid = TRUE,
+    tabPanel("Heat Map for Crimes in Seattle", fluid = TRUE,
              sidebarLayout(
                sidebarPanel(
                  # State Widget
@@ -67,7 +70,8 @@ ui <- fluidPage(
           selectInput("user_month", "Month", choices = month, selected = "")
         ),
         mainPanel(     # specify content for the "main" column
-          textOutput("Bar Graph"),
+          br(),
+          textOutput("bar_title"),
           br(),
           plotOutput("bargraph"),
           br(),
@@ -217,14 +221,19 @@ server <- function(input,output) {
                   mapping = aes(x = Summarized.Offense.Description, y = n,
                                 fill = Summarized.Offense.Description)) +
       geom_bar(stat = "identity") +
-      ggtitle("Top 5 Crimes in the Selected Month in 2017") +
+      ggtitle("") +
       xlab("Crime Type") +
       ylab("Number of Incidents") +
       guides(fill = guide_legend(title = "Crime Type")) +
       theme_bw()
     return(bar)
   })
-
+  
+  output$bar_title <- renderText({
+    text <- HTML(paste0("Top 5 Crimes in the month of ", input$user_month[1] ," in 2017"))
+    return(text)
+  })
+  
   output$bar_analysis <- renderText({
     data_text <- filtered_table_bargraph()
     crime_type <- data_text[, 1]
@@ -304,11 +313,6 @@ server <- function(input,output) {
       return(12)
     }
   })
-  
-  
-  
-  
-  
 }
 
 # Create a new `shinyApp()` using the above ui and server
