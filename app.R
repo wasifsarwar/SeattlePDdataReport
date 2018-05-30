@@ -302,11 +302,10 @@ server <- function(input,output) {
   
   # GEt data
   filtered_table_freq_plot <- reactive({
-    data <- filter(data, Summarized.Offense.Description == 
-                           toupper(input$crime_freq_type))
+    data <- filter(data, Summarized.Offense.Description == toupper(input$crime_freq_type))
     
     result <- select(data, Summarized.Offense.Description, Occurred.Date.or.Date.Range.Start, Month, Year)
-    
+    result$Occurred.Date <- str_split(result$Occurred.Date.or.Date.Range.Start, " ")[[1]][1] # Add date column
     return(result)
   })
   
@@ -315,17 +314,10 @@ server <- function(input,output) {
   
   output$freq_plot <- renderPlot({
     result <- filtered_table_freq_plot() # Get Data
-    result$Occurred.Date <- str_split(result$Occurred.Date.or.Date.Range.Start, " ")[[1]][1] # Add date column
-    x <- ggplot(data = result) + 
-      geom_tile(colour = "white", mapping = aes(x = Occurred.Date.or.Date.Range.Start, y = Month, fill = Summarized.Offense.Description)) + 
-      facet_grid(Year ~ .) + 
-      scale_fill_gradient(low="red", high="green") +
-      labs(x="Week of Month",
-           y="",
-           title = "Time-Series Calendar Heatmap", 
-           subtitle="Yahoo Closing Price", 
-           fill="Close")
-
+    x <- ggplot(data = result) +
+      geom_tile(mapping = aes(Occurred.Date.or.Date.Range.Start, Summarized.Offense.Description, fill = Month)) +
+      facet_grid(Year ~ Month)
+    
     return(x)
   })
   
