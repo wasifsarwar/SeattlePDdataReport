@@ -93,13 +93,20 @@ ui <- fluidPage(
                )
              )
     ),
-    tabPanel("Israel", fluid = TRUE,
+    tabPanel("Resolved Crime Rates", fluid = TRUE,
              sidebarLayout(   # layout the page in two columns
                sidebarPanel(  # specify content for the "sidebar" column
-                 p("sidebar panel content goes here")
+                 selectInput("crime_in", "Offense Type", choices = offense_type, selected = ""),
+                 selectInput("district_in", "District", choices = districts, selected = ""),
+                 helpText("heyooooooo")
                ),
                mainPanel(     # specify content for the "main" column
-                 p("main panel content goes here")
+                 br(),
+                 p("main panel content goes here"),
+                 br(),
+                 plotOutput("density_plot"),
+                 br(),
+                 textOutput("density_analysis")
                )
              )
     )
@@ -264,7 +271,70 @@ server <- function(input,output) {
   #### SECTION THREE ####
   #######################
   
+  #filtered data
+  resolved_df <- reactive({
+    filt_df <- data %>% 
+      filter(District.Sector == (input$district_in)) %>% 
+      filter(Summarized.Offense.Description == toupper(input$crime_in)) %>% 
+      select(Summarized.Offense.Description, Month,
+             Occurred.Date.Range.End, District.Sector) %>% 
+      mutate(Resolved = (Occurred.Date.Range.End != ""))
+    
+    return(filt_df)
+  })
   
+  #resolved count
+  rc_count <- reactive({
+    reactive_data <- resolved_df()
+    
+    resolved_crimes <- NROW(reactive_data %>% 
+                              filter(Resolved == TRUE))
+    return(resolved_crimes)
+  })
+  
+  #unresolved count
+  urc_count <- reactive({
+    reactive_data <- resolved_df()
+    
+    unresolved_crimes <- NROW(reactive_data %>% 
+                                filter(Resolved == FALSE))
+    return(unresolved_crimes)
+  })
+  
+  #density plot
+  output$density_plot <- renderPlot({
+    reactive_data <- resolved_df()
+    reactive_res <- rc_count()
+    reactive_unres <- urc_count()
+    
+    g <- ggplot(reactive_data, aes(Month)) + 
+      geom_density(aes(fill=factor(Resolved)), alpha=0.7) + 
+      labs(title="Resolved Crime Rate Density by Crime & District",
+           subtitle=paste0("Percentage of ", input$crime_in, " Crimes located in ", ######
+                           input$district_in, " District"), ######
+           caption="Source: suck my ass", ######
+           x = "Month",
+           y="Density (Crime Rate %)",
+           fill="Case Status") +
+      scale_x_continuous(breaks = c(seq(1:12)),
+                         label = c("JAN", "FEB", "MAR",
+                                   "APR", "MAY", "JUNE",
+                                   "JULY", "AUG", "SEPT",
+                                   "OCT", "NOV", "DEC")) +
+      scale_y_continuous(labels = scales::percent) +
+      scale_fill_manual(name = "Case Status",
+                        labels = list(paste("Unresolved:", reactive_res),
+                                      paste("Resolved:", reactive_unres)),
+                        values = c("#f6cac9", "#91a7d0"), #pantones: rosequartz + serenity
+                        guide = guide_legend(reverse=TRUE))
+    return(g)
+  })
+  
+  #plot analysis
+  output$density_analysis <- renderText({
+    text <- HTML("Add the cool data analysis here.")
+    return(text)
+  })
   
   ######################
   #### SECTION FOUR ####
