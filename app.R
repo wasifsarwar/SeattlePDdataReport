@@ -243,7 +243,12 @@ server <- function(input,output) {
                         tolower(crime_type[2,]), " at ", crime_freq[2,], " occurances, ",
                         tolower(crime_type[3,]), " at ", crime_freq[3,], " occurances, ",
                         tolower(crime_type[4,]), " at ", crime_freq[4,], " occurances, ",
-                        tolower(crime_type[5,]), " at ", crime_freq[5,], " occurances, "))
+                        tolower(crime_type[5,]), " at ", crime_freq[5,], " occurances. ",
+                        "Throughout the year, the crimes 'Burglary' and 'Car Prowl' are two of 
+                        the most common types of crimes. This is most likely due to the fact that, during
+                        the winter months, there is more darkness to conceal the actions of the criminal(s). 
+                        And during the summer months, there are less people supervising their property, likely
+                        because they are gone on vacation."))
     return(text)
   })
   
