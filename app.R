@@ -48,11 +48,30 @@ ui <- fluidPage(
                             #density_title {
                               text-align: center;
                             }
+                            h1 {
+                              font-size : 40px;
+                              font-weight: 500;
+                              line-height: 1.1;
+                            }
+                            h2 {
+                              font-size: 30px;
+                              font-weight: 400;
+                            }
+                            h3 {
+                              font-size: 25px;
+                              font-weight: 300;
+                            }
+                            h4{
+                              font-size: 20px;
+                              font-weight: 200;
+                            }
+                            p {
+                              font-weight: 100;
+                              font-size: 15px;
+                            }
                             "))),
   
-  titlePanel(
-    "Seattle crime data report 2017"
-    ),
+  h1("Seattle Crime Data Report of 2017"),
   
   tabsetPanel(
     tabPanel("Heat Map for Crimes in Seattle", fluid = TRUE,
@@ -131,6 +150,25 @@ ui <- fluidPage(
                  textOutput("density_analysis")
                )
              )
+    ),
+    tabPanel("Documentation", fluid = TRUE,
+             h2("Project Documentation"),
+             h4("Created By: Wasif Siddique, Jeremy Chang, Rey Matsunaga, Israel-SixtoSanchez"),
+             br(),
+             h3("Project Description"),
+             p("The data set that we worked with can be found here:",a(href = "https://data.seattle.gov/Public-Safety/Seattle-Police-Department-Police-Report-Incident/7ais-f98f", "Seattle PD data")),
+             p("This dataset is based on information from the Seattle City Gov website that records incidents based on initial police reports taken by officers when responding to incidents around the city.
+               We've filtered out the data for 2017 records only."),
+             p("This data report gives us an insider about how frequently crime is reported over different regions in Seattle. It also presents 
+               visualizations regarding how frequent a certain crime is reported everyday for a specific month, and what the statistics are for the reported crimes to be resolved
+               by the police."),
+             br(),
+             h3("Technical Description"),
+             p("To create the visualizations we used", a(href = "https://shiny.rstudio.com/", "shiny"), ", ", 
+               a(href = "https://rstudio.github.io/leaflet/", "leaflet for R"), ",  and " , a(href = "https://ggplot2.tidyverse.org/", "ggplot"), ". 
+               For the in depth data manipulation we used", a(href = "https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html","dplyr"), "."),
+             p("The interactive widgets on the side allows the user to select crime types, specify months and location. Therefore the resulting plots and analysis are dynamic,
+               and will represent the data analysis corresponding to whatever month or location the user chooses to explore.")
     )
   )
 )
@@ -166,6 +204,12 @@ server <- function(input,output) {
       return(12)
     }
   })
+  
+  #####################
+  ### DOCUMENTATION ###
+  #####################
+  
+  output$documentation <- 
   
   
   # reactive variable for shared data
