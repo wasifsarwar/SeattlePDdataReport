@@ -19,6 +19,9 @@ offense_type <- tolower(unique(data$Summarized.Offense.Description))
 month <- c("January", "February", "March", "April", "May", "June", "July",
            "August","September", "October", "November", "December")
 
+date_col <- substr(data$Date.Reported, 1, 10)
+data[ ,"Recorded_Date"] <- date_col
+
 districts <- unique(data$District.Sector)
 
 
