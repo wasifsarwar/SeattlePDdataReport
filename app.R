@@ -87,7 +87,8 @@ ui <- fluidPage(
     tabPanel("Crime Frequency" , fluid = TRUE,
              sidebarLayout(   # layout the page in two columns
                sidebarPanel(  # specify content for the "sidebar" column
-                 selectInput("crime_freq_type", "Offense Type", choices = offense_type, selected = "")
+                 selectInput("crime_freq_type", "Offense Type", choices = offense_type, selected = ""),
+                 selectInput("month_freq", "Month", choices = month, selected = "")
                ),
                mainPanel(
                  br(),
@@ -378,7 +379,7 @@ server <- function(input,output) {
   ######################
   # Get Month
   select_month_freq <- reactive({
-    text <- input$month_freq
+    text <- input$month_freq[1]
     if (text == "January" ){
       return(1)
     } else if (text == "February"){
@@ -409,10 +410,9 @@ server <- function(input,output) {
   
   # GEt data
   filtered_table_freq_plot <- reactive({
-    data <- filter(data, Summarized.Offense.Description == toupper(input$crime_freq_type))
+    data <- filter(data, Summarized.Offense.Description == toupper(input$crime_freq_type) & Month == select_month_freq())  
     
     result <- select(data, Summarized.Offense.Description, Occurred.Date.or.Date.Range.Start, Month, Year)
-    result$Occurred.Date <- str_split(result$Occurred.Date.or.Date.Range.Start, " ")[[1]][1] # Add date column
     return(result)
   })
   
@@ -420,16 +420,21 @@ server <- function(input,output) {
   # Render frequncy Plot over time for specified crime
   
   output$freq_plot <- renderPlot({
+    library(RColorBrewer)
     result <- filtered_table_freq_plot() # Get Data
-    x <- ggplot(data = result) +
-      geom_tile(mapping = aes(Month, Occurred.Date, fill = nrow(result)), width = .5) +
-      facet_grid(Year ~ Month) +
-      scale_fill_gradient(low = "red", high = "green") + 
-      labs(x = "Date of Occurrence",
-           y = "",
-           title = paste0("Time-Series Calendar Heatmap For ", input$crime_freq_type), 
-           fill="Close")
     
+    result$Date <- as.character(as.Date(as.character(as.POSIXct(result$Occurred.Date.or.Date.Range.Start, 
+                                                   format = "%m/%d/%Y %H:%M:%S %p"))))
+    
+    # Plot
+    x <- ggplot(result) +
+      geom_bar(mapping = aes(x = Date), width = 0.5) + 
+      theme(axis.text.x = element_text(angle=90, vjust=0.6)) +
+      scale_color_brewer(palette = "Set3") +
+      labs(title="Categorywise Bar Chart", 
+           subtitle="Manufacturer of vehicles", 
+           caption="Source: Manufacturers from 'mpg' dataset")
+  
     return(x)
   })
   
