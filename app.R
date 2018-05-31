@@ -42,6 +42,9 @@ ui <- fluidPage(
                             #bar_title {
                             text-align: center;
                             }
+                            #frequency_title {
+                            text-align : center;
+                            }
                             "))),
   
   titlePanel(
@@ -88,12 +91,20 @@ ui <- fluidPage(
              sidebarLayout(   # layout the page in two columns
                sidebarPanel(  # specify content for the "sidebar" column
                  selectInput("crime_freq_type", "Offense Type", choices = offense_type, selected = ""),
-                 selectInput("month_freq", "Month", choices = month, selected = "")
+                 selectInput("month_freq", "Month", choices = month, selected = ""),
+                 helpText("Note: certain offense and month combinations contain empty data,
+                          and will thus display empty visualizations. This plot is intended to
+                          visualize how frequent crimes in Seattle are for a selected month to
+                          answer the questions concerning what time of month are particularly trending 
+                          for crime.")
                ),
                mainPanel(
                  br(),
+                 textOutput("frequency_title"),
+                 br(),
                  plotOutput("freq_plot"),
-                 br()
+                 br(),
+                 textOutput("crime_frequency")
                )
              )
     ),
@@ -412,7 +423,7 @@ server <- function(input,output) {
   filtered_table_freq_plot <- reactive({
     data <- filter(data, Summarized.Offense.Description == toupper(input$crime_freq_type) & Month == select_month_freq())  
     
-    result <- select(data, Summarized.Offense.Description, Occurred.Date.or.Date.Range.Start, Month, Year)
+    result <- select(data, Summarized.Offense.Description,Date.Reported, Occurred.Date.or.Date.Range.Start, Month, Year)
     return(result)
   })
   
@@ -423,7 +434,7 @@ server <- function(input,output) {
     library(RColorBrewer)
     result <- filtered_table_freq_plot() # Get Data
     
-    result$Date <- as.character(as.Date(as.character(as.POSIXct(result$Occurred.Date.or.Date.Range.Start, 
+    result$Date <- as.character(as.Date(as.character(as.POSIXct(result$Date.Reported, 
                                                    format = "%m/%d/%Y %H:%M:%S %p"))))
     
     # Plot
@@ -431,11 +442,28 @@ server <- function(input,output) {
       geom_bar(mapping = aes(x = Date), width = 0.5) + 
       theme(axis.text.x = element_text(angle=90, vjust=0.6)) +
       scale_color_brewer(palette = "Set3") +
-      labs(title="Categorywise Bar Chart", 
-           subtitle="Manufacturer of vehicles", 
-           caption="Source: Manufacturers from 'mpg' dataset")
-  
+      labs(title= "",
+           x = "Month",
+           y="Frequency of Crime")
     return(x)
+  })
+  
+  output$crime_frequency <- renderText({
+    result <- filtered_table_freq_plot()
+    
+    ###################
+    ####### REY #######
+    ###################
+    
+    #FIND THE highest number of crimes happened for that month and on which day of the month did it happen.
+    #highest <- max(result$)
+    text <- HTML(paste0("This frequency plot shows a visualization of how frequent ",input$crime_freq_type ," is
+      for the month of ",input$month_freq[1],".  " ))
+    return(text)
+  })
+  
+  output$frequency_title <- renderText({
+    text <- HTML(paste0("Bar Graph for ", input$crime_freq_type, " over each day in ",input$month_freq[1],"."))
   })
   
   crime_month <- reactive({
