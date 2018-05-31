@@ -378,7 +378,7 @@ server <- function(input,output) {
     data <- filter(data, Summarized.Offense.Description == toupper(input$crime_freq_type))
     
     result <- select(data, Summarized.Offense.Description, Occurred.Date.or.Date.Range.Start, Month, Year)
-  #  result$Occurred.Date <- str_split(result$Occurred.Date.or.Date.Range.Start, " ")[[1]][1] # Add date column
+    result$Occurred.Date <- str_split(result$Occurred.Date.or.Date.Range.Start, " ")[[1]][1] # Add date column
     return(result)
   })
   
@@ -388,11 +388,11 @@ server <- function(input,output) {
   output$freq_plot <- renderPlot({
     result <- filtered_table_freq_plot() # Get Data
     x <- ggplot(data = result) +
-      geom_tile(mapping = aes(Occurred.Date.or.Date.Range.Start, Summarized.Offense.Description, fill = Month)) +
+      geom_tile(mapping = aes(Month, Occurred.Date, fill = nrow(result)), width = .5) +
       facet_grid(Year ~ Month) +
-      scale_fill_gradient(low="red", high="green") + 
-      labs(x="Date of Occurrence",
-           y="",
+      scale_fill_gradient(low = "red", high = "green") + 
+      labs(x = "Date of Occurrence",
+           y = "",
            title = paste0("Time-Series Calendar Heatmap For ", input$crime_freq_type), 
            fill="Close")
     
