@@ -34,16 +34,19 @@ ui <- fluidPage(
   
   tags$head(tags$style(HTML("
                             #maptitle {
-                            text-align: center;
+                              text-align: center;
                             }
                             div.box-header {
-                            text-align: center;
+                              text-align: center;
                             }
                             #bar_title {
-                            text-align: center;
+                              text-align: center;
                             }
                             #frequency_title {
-                            text-align : center;
+                              text-align : center;
+                            }
+                            #density_title {
+                              text-align: center;
                             }
                             "))),
   
@@ -120,6 +123,8 @@ ui <- fluidPage(
                           resolved in, relative to the crime and district selected.")
                ),
                mainPanel(     # specify content for the "main" column
+                 br(),
+                 textOutput("density_title"),
                  br(),
                  plotOutput("density_plot"),
                  br(),
@@ -327,10 +332,9 @@ server <- function(input,output) {
     
     g <- ggplot(reactive_data, aes(Month)) + 
       geom_density(aes(fill=factor(Resolved)), alpha=0.7) + 
-      labs(title="Resolved Crime Rate Density by Crime & District",
-           subtitle=paste0("Percentage of ", input$crime_in, " Crimes located in ",
-                           input$district_in, " District"),
-           caption="Source: Seattle PD: PRI ",
+      labs(title="",
+           subtitle=paste0("Percentage of ", input$crime_in, " Crimes reported in ",
+                           input$district_in),
            x = "Month",
            y="Density (Crime Rate %)",
            fill="Case Status") +
@@ -369,6 +373,11 @@ server <- function(input,output) {
     
     text <- HTML(para)
     
+    return(text)
+  })
+  
+  output$density_title <- renderText({
+    text <- HTML("Resolved Crime Rate Density by Crime & District")
     return(text)
   })
   
@@ -468,9 +477,9 @@ server <- function(input,output) {
     
     highest_date <- result_grouped[1, 1]
     highest <- result_grouped[1, 2]
-    text <- HTML(paste0("This frequency plot shows a visualization of how frequent ",input$crime_freq_type ," is
-      for the month of ",input$month_freq[1],".  The highest number of ", input$crime_freq_type, " happened in this month is "
-                        , highest, ". This occurred on ", highest_date, "."))
+    text <- HTML(paste0("This frequency plot shows a visualization of how frequent ",input$crime_freq_type ," was
+      for the month of ",input$month_freq[1],".  The highest record of ", input$crime_freq_type, " that happened in " , 
+                        input$month_freq[1], "is ", highest, "  which occurred on ", highest_date, "."))
     return(text)
   })
   
