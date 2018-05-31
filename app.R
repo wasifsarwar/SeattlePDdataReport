@@ -22,7 +22,7 @@ month <- c("January", "February", "March", "April", "May", "June", "July",
 date_col <- substr(data$Date.Reported, 1, 10)
 data[ ,"Recorded_Date"] <- date_col
 
-districts <- unique(data$District.Sector)
+districts <- c("U-District", "West Seattle", "Greater Ballard", "North Seattle")
 
 
 ## we're only doing records for 2017
@@ -278,8 +278,9 @@ server <- function(input,output) {
   
   #filtered data
   resolved_df <- reactive({
+    district <- select_district()
     filt_df <- data %>% 
-      filter(District.Sector == (input$district_in)) %>% 
+      filter(District.Sector == district) %>% 
       filter(Summarized.Offense.Description == toupper(input$crime_in)) %>% 
       select(Summarized.Offense.Description, Month,
              Occurred.Date.Range.End, District.Sector) %>% 
@@ -357,6 +358,19 @@ server <- function(input,output) {
     text <- HTML(para)
     
     return(text)
+  })
+  
+  select_district <- reactive({
+    text <- input$district_in[1]
+    if (text == "U-District") {
+      return("U")
+    } else if (text == "West Seattle") {
+      return("W")
+    } else if (text == "Greater Ballard") {
+      return("J")
+    } else if (text == "North Seattle") {
+      return("N")
+    }
   })
   
   ######################
