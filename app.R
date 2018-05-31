@@ -19,6 +19,9 @@ offense_type <- tolower(unique(data$Summarized.Offense.Description))
 month <- c("January", "February", "March", "April", "May", "June", "July",
            "August","September", "October", "November", "December")
 
+date_col <- substr(data$Date.Reported, 1, 10)
+data[ ,"Recorded_Date"] <- date_col
+
 districts <- unique(data$District.Sector)
 
 
@@ -339,13 +342,43 @@ server <- function(input,output) {
   ######################
   #### SECTION FOUR ####
   ######################
+  # Get Month
+  select_month_freq <- reactive({
+    text <- input$month_freq
+    if (text == "January" ){
+      return(1)
+    } else if (text == "February"){
+      return(2)
+    } else if (text == "March") {
+      return(3)
+    } else if (text == "April") {
+      return(4)
+    } else if (text == "May") {
+      return(5)
+    } else if (text == "June") {
+      return(6)
+    } else if (text == "July") {
+      return(7)
+    } else if (text == "August") {
+      return(8)
+    } else if (text == "September") {
+      return(9)
+    } else if (text == "October") {
+      return(10)
+    } else if (text == "November") {
+      return(11)
+    } else if (text == "December") {
+      return(12)
+    }
+  })
+  
   
   # GEt data
   filtered_table_freq_plot <- reactive({
-    data <- filter(data,Summarized.Offense.Description == 
+    data <- filter(data, Summarized.Offense.Description == 
                            toupper(input$crime_freq_type))
     
-    result <- select(data, Summarized.Offense.Description, Month)
+    result <- select(data, Summarized.Offense.Description, Occurred.Date.or.Date.Range.Start, Month, Year)
     
     return(result)
   })
@@ -354,17 +387,18 @@ server <- function(input,output) {
   # Render frequncy Plot over time for specified crime
   
   output$freq_plot <- renderPlot({
-    result <- filtered_table_freq_plot()
-    
-    x <- ggplot(data = result) +
-      geom_bar(mapping = aes(x = Month), stat = "count", width = .5) + # no y mapping needed!
-      labs(
-        title=paste0(input$crime_freq_type, " in 2017"),
-        x = "Month",
-        y = paste0("Count for ", input$crime_freq_type),
-        legend = ""
-      ) + 
-      guides(fill = guide_legend(title=""))
+    result <- filtered_table_freq_plot() # Get Data
+    result$Occurred.Date <- str_split(result$Occurred.Date.or.Date.Range.Start, " ")[[1]][1] # Add date column
+    x <- ggplot(data = result) + 
+      geom_tile(colour = "white", mapping = aes(x = Occurred.Date.or.Date.Range.Start, y = Month, fill = Summarized.Offense.Description)) + 
+      facet_grid(Year ~ .) + 
+      scale_fill_gradient(low="red", high="green") +
+      labs(x="Week of Month",
+           y="",
+           title = "Time-Series Calendar Heatmap", 
+           subtitle="Yahoo Closing Price", 
+           fill="Close")
+
     return(x)
   })
   
