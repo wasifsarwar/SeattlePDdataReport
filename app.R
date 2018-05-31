@@ -13,14 +13,12 @@ library(leaflet)
 library(leaflet.extras)
 library(shinythemes)
 
+# read data
 data <- read.csv("./data/Seattle_police_data_2017.csv",na.strings = "NA",
                  stringsAsFactors = FALSE, fill = TRUE, header = TRUE)
 offense_type <- tolower(unique(data$Summarized.Offense.Description))
 month <- c("January", "February", "March", "April", "May", "June", "July",
            "August","September", "October", "November", "December")
-
-date_col <- substr(data$Date.Reported, 1, 10)
-data[ ,"Recorded_Date"] <- date_col
 
 districts <- c("U-District", "West Seattle", "Greater Ballard", "North Seattle")
 
@@ -30,7 +28,7 @@ districts <- c("U-District", "West Seattle", "Greater Ballard", "North Seattle")
 
 ui <- fluidPage(
   #shinythemes::themeSelector(),
-  theme = shinythemes::shinytheme("spacelab"),
+  theme = shinythemes::shinytheme("cosmo"),
   
   tags$head(tags$style(HTML("
                             #maptitle {
@@ -72,7 +70,7 @@ ui <- fluidPage(
                             "))),
   
   h1("Seattle Crime Data Report of 2017"),
-  
+  # The 5 tabs for 4 questions and documentation
   tabsetPanel(
     tabPanel("Heat Map for Crimes in Seattle", fluid = TRUE,
              sidebarLayout(
@@ -205,12 +203,6 @@ server <- function(input,output) {
     }
   })
   
-  #####################
-  ### DOCUMENTATION ###
-  #####################
-  
-  output$documentation <- 
-  
   
   # reactive variable for shared data
   filtered_table_heatmap <- reactive({
@@ -271,7 +263,7 @@ server <- function(input,output) {
   #####################
   #### SECTION TWO ####
   #####################
-  #Jeremy: create a bar graph that shows the top 5 most frequent crimes every month in 2017.
+  
   # Reactive Data Table for the top 5 crimes
   filtered_table_bargraph <- reactive({
     # Select desired columns
@@ -304,11 +296,13 @@ server <- function(input,output) {
     return(bar)
   })
   
+  # Outputs bar graph title
   output$bar_title <- renderText({
     text <- HTML(paste0("Top 5 Crimes in the month of ", input$user_month[1] ," in 2017"))
     return(text)
   })
   
+  #Outputs
   output$bar_analysis <- renderText({
     data_text <- filtered_table_bargraph()
     crime_type <- data_text[, 1]
