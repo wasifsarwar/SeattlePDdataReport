@@ -423,7 +423,7 @@ server <- function(input,output) {
   filtered_table_freq_plot <- reactive({
     data <- filter(data, Summarized.Offense.Description == toupper(input$crime_freq_type) & Month == select_month_freq() & Year == 2017)  
     
-    result <- select(data, Summarized.Offense.Description,Date.Reported, Occurred.Date.or.Date.Range.Start, Month, Year)
+    result <- select(data, Summarized.Offense.Description,Date.Reported, Month, Year)
     return(result)
   })
   
@@ -450,15 +450,27 @@ server <- function(input,output) {
   
   output$crime_frequency <- renderText({
     result <- filtered_table_freq_plot()
+    result$Date <- as.character(as.Date(as.character(as.POSIXct(result$Date.Reported, 
+                                                                format = "%m/%d/%Y %H:%M:%S %p"))))
     
     ###################
     ####### REY #######
     ###################
     
     #FIND THE highest number of crimes happened for that month and on which day of the month did it happen.
-    #highest <- max(result$)
+   # use the max function, Make a count for each date of how many times it has been repeated
+    
+    result_grouped <- group_by(result, Date) %>% 
+      summarize(
+        n = n()
+      ) %>% 
+      arrange(-n)
+    
+    highest_date <- result_grouped[1, 1]
+    highest <- result_grouped[1, 2]
     text <- HTML(paste0("This frequency plot shows a visualization of how frequent ",input$crime_freq_type ," is
-      for the month of ",input$month_freq[1],".  " ))
+      for the month of ",input$month_freq[1],".  The highest number of ", input$crime_freq_type, " happened in this month is "
+                        , highest, ". This occurred on ", highest_date, "."))
     return(text)
   })
   
