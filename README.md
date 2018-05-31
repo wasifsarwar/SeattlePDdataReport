@@ -10,9 +10,9 @@ The report answers 4 questions about crime in Seattle:
 
 * What are the top 5 crimes that has been reported the most for a specific month in Seattle?
 
-* Rey's question
+* What times of the month are noted to have a higher record of crime reports in Seattle?
 
-* Israel's question
+* For certain districts such as North Seattle, U-District, West Seattle and Greater Ballard, how effective are the Police in resolving crime reports?
 
 For visual representations of the data, **leaflet** and **ggplot** is used.
 
