@@ -302,7 +302,7 @@ server <- function(input,output) {
     return(text)
   })
   
-  #Outputs
+  #Outputs bar graph analysis
   output$bar_analysis <- renderText({
     data_text <- filtered_table_bargraph()
     crime_type <- data_text[, 1]
@@ -317,6 +317,7 @@ server <- function(input,output) {
     return(text)
   })
   
+  # Outputs bar graph trend
   output$bar_trend <- renderText({
     text <- HTML("Throughout the year, burglary and car prowl are two of 
                         the most common types of crimes. This is most likely due to the fact that, during
@@ -328,7 +329,7 @@ server <- function(input,output) {
   })
   
   #######################
-  #### SECTION THREE ####
+  #### SECTION FOUR #####
   #######################
   
   #filtered data
@@ -414,11 +415,13 @@ server <- function(input,output) {
     return(text)
   })
   
+  # outputs density plot title
   output$density_title <- renderText({
     text <- HTML("Resolved Crime Rate Density by Crime & District")
     return(text)
   })
   
+  # Reactive function to select correct district
   select_district <- reactive({
     text <- input$district_in[1]
     if (text == "U-District") {
@@ -432,9 +435,9 @@ server <- function(input,output) {
     }
   })
   
-  ######################
-  #### SECTION FOUR ####
-  ######################
+  #######################
+  #### SECTION THREE ####
+  #######################
   # Get Month
   select_month_freq <- reactive({
     text <- input$month_freq[1]
@@ -466,7 +469,7 @@ server <- function(input,output) {
   })
   
   
-  # GEt data
+  # Get data
   filtered_table_freq_plot <- reactive({
     data <- filter(data, Summarized.Offense.Description == toupper(input$crime_freq_type) & Month == select_month_freq() & Year == 2017)  
     
@@ -495,18 +498,11 @@ server <- function(input,output) {
     return(x)
   })
   
+  # Outputs crime frequency analysis
   output$crime_frequency <- renderText({
     result <- filtered_table_freq_plot()
     result$Date <- as.character(as.Date(as.character(as.POSIXct(result$Date.Reported, 
                                                                 format = "%m/%d/%Y %H:%M:%S %p"))))
-    
-    ###################
-    ####### REY #######
-    ###################
-    
-    #FIND THE highest number of crimes happened for that month and on which day of the month did it happen.
-   # use the max function, Make a count for each date of how many times it has been repeated
-    
     result_grouped <- group_by(result, Date) %>% 
       summarize(
         n = n()
@@ -521,6 +517,7 @@ server <- function(input,output) {
     return(text)
   })
   
+  # Outputs frequency graph title
   output$frequency_title <- renderText({
     text <- HTML(paste0("Bar Graph for ", input$crime_freq_type, " over each day in ",input$month_freq[1],"."))
   })
