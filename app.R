@@ -410,7 +410,7 @@ server <- function(input,output) {
   
   # GEt data
   filtered_table_freq_plot <- reactive({
-    data <- filter(data, Summarized.Offense.Description == toupper(input$crime_freq_type) & Month == select_month_freq())  
+    data <- filter(data, Summarized.Offense.Description == toupper(input$crime_freq_type) & Month == select_month_freq() & Year == 2017)  
     
     result <- select(data, Summarized.Offense.Description, Occurred.Date.or.Date.Range.Start, Month, Year)
     return(result)
@@ -431,9 +431,10 @@ server <- function(input,output) {
       geom_bar(mapping = aes(x = Date), width = 0.5) + 
       theme(axis.text.x = element_text(angle=90, vjust=0.6)) +
       scale_color_brewer(palette = "Set3") +
-      labs(title="Categorywise Bar Chart", 
-           subtitle="Manufacturer of vehicles", 
-           caption="Source: Manufacturers from 'mpg' dataset")
+      labs(title= paste0(input$crime_freq_type, " in ", input$month_freq[1]), 
+           x = "Date",
+           y = paste0("Frequency of ", input$crime_freq_type, " Occurring")
+           )
   
     return(x)
   })
