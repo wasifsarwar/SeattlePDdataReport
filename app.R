@@ -62,7 +62,7 @@ ui <- fluidPage(
                               font-weight: 300;
                             }
                             h4{
-                              font-size: 20px;
+                              font-size: 18px;
                               font-weight: 200;
                             }
                             p {
@@ -168,7 +168,7 @@ ui <- fluidPage(
                a(href = "https://rstudio.github.io/leaflet/", "leaflet for R"), ",  and " , a(href = "https://ggplot2.tidyverse.org/", "ggplot"), ". 
                For the in depth data manipulation we used", a(href = "https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html","dplyr"), "."),
              p("The interactive widgets on the side allows the user to select crime types, specify months and location. Therefore the resulting plots and analysis are dynamic,
-               and will represent the data analysis corresponding to whatever month or location the user chooses to explore.")
+               and will represent the data analysis corresponding to whatever crime type, month or location the user chooses to explore.")
     )
   )
 )
