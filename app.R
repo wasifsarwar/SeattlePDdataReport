@@ -22,7 +22,7 @@ month <- c("January", "February", "March", "April", "May", "June", "July",
 date_col <- substr(data$Date.Reported, 1, 10)
 data[ ,"Recorded_Date"] <- date_col
 
-districts <- unique(data$District.Sector)
+districts <- c("U-District", "West Seattle", "Greater Ballard", "North Seattle")
 
 
 ## we're only doing records for 2017
@@ -101,11 +101,13 @@ ui <- fluidPage(
                sidebarPanel(  # specify content for the "sidebar" column
                  selectInput("crime_in", "Offense Type", choices = offense_type, selected = ""),
                  selectInput("district_in", "District", choices = districts, selected = ""),
-                 helpText("heyooooooo")
+                 helpText("Note: certain offense and district combinations contain empty data,
+                          and will thus display empty visualizations. This plot is intended to
+                          visualize common crimes in densely populated areas of Seattle to
+                          answer the questions concerning what time of year are most cases
+                          resolved in, relative to the crime and district selected.")
                ),
                mainPanel(     # specify content for the "main" column
-                 br(),
-                 p("main panel content goes here"),
                  br(),
                  plotOutput("density_plot"),
                  br(),
@@ -276,8 +278,9 @@ server <- function(input,output) {
   
   #filtered data
   resolved_df <- reactive({
+    district <- select_district()
     filt_df <- data %>% 
-      filter(District.Sector == (input$district_in)) %>% 
+      filter(District.Sector == district) %>% 
       filter(Summarized.Offense.Description == toupper(input$crime_in)) %>% 
       select(Summarized.Offense.Description, Month,
              Occurred.Date.Range.End, District.Sector) %>% 
@@ -313,9 +316,9 @@ server <- function(input,output) {
     g <- ggplot(reactive_data, aes(Month)) + 
       geom_density(aes(fill=factor(Resolved)), alpha=0.7) + 
       labs(title="Resolved Crime Rate Density by Crime & District",
-           subtitle=paste0("Percentage of ", input$crime_in, " Crimes located in ", ######
-                           input$district_in, " District"), ######
-           caption="Source: suck my ass", ######
+           subtitle=paste0("Percentage of ", input$crime_in, " Crimes located in ",
+                           input$district_in, " District"),
+           caption="Source: Seattle PD: PRI ",
            x = "Month",
            y="Density (Crime Rate %)",
            fill="Case Status") +
@@ -335,8 +338,39 @@ server <- function(input,output) {
   
   #plot analysis
   output$density_analysis <- renderText({
-    text <- HTML("Add the cool data analysis here.")
+    reactive_res <- rc_count()
+    reactive_unres <- urc_count()
+    
+    total <- reactive_unres + reactive_res
+    
+    para <- paste0("This interactive visualization provides information on the 
+                       density of resolved/unresolved crimes in Seattle. It allows 
+                       the user to compare different districts and crime types to 
+                       determine what month of the year crimes are likely to beresolved. 
+                       We can see that throughout the year, there are two peaks consistently 
+                       occur from Jan-June, and July-Dec. This particular visualization looks at ",
+                       input$crime_in, " crimes in the ", input$district_in, " district. An important factor
+                       to note, is that of ", input$crime_in, " crimes in the ", input$district_in, " district, only about ",
+                       round(((reactive_unres/total) * 100), 2), "% have been resolved, while ", 
+                       round(((reactive_res/total) * 100), 2), "% have remained unresolved in a total of ", total, " crimes."
+                       )
+    
+    text <- HTML(para)
+    
     return(text)
+  })
+  
+  select_district <- reactive({
+    text <- input$district_in[1]
+    if (text == "U-District") {
+      return("U")
+    } else if (text == "West Seattle") {
+      return("W")
+    } else if (text == "Greater Ballard") {
+      return("J")
+    } else if (text == "North Seattle") {
+      return("N")
+    }
   })
   
   ######################
