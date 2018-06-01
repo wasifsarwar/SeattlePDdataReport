@@ -16,5 +16,7 @@ The report answers 4 questions about crime in Seattle:
 
 For visual representations of the data, **leaflet** and **ggplot** is used.
 
+The report can be found here: [Seattle Crime Data Report of 2017](https://wasifsarwar.shinyapps.io/SeattleCrimeReport2017/)
+
 The raw data used to create this data report is sourced from here: 
 [Seattle PD data](https://data.seattle.gov/Public-Safety/Seattle-Police-Department-Police-Report-Incident/7ais-f98f)

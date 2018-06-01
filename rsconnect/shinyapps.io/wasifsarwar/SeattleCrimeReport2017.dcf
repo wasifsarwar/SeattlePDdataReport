@@ -1,0 +1,12 @@
+name: SeattleCrimeReport2017
+title: SeattleCrimeReport2017
+username:
+account: wasifsarwar
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 351933
+bundleId: 1403228
+url: https://wasifsarwar.shinyapps.io/SeattleCrimeReport2017/
+when: 1527793071.07253
+asMultiple: FALSE
+asStatic: FALSE
