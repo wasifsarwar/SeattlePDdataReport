@@ -1,6 +1,6 @@
 # Seattle Crime Data Report of 2017
 
-### Wasif Siddique, Jeremy Chang, Rey Matsunaga and Israel Sixto-Sanchez
+### Wasif Siddique
 
 The data report contains textual and visual representations explaining the trends of the _crime rates_ in **Seattle**. The report is created using **R** and the **shiny** framework. 
 
